@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio, To-Do List, & Product Listing</title>
+    <style>
+        /* Basic Styles for Layout */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #e6e6fa;
+        }
+
+        header {
+            background-color: #00008B;
+            color: #fff;
+            text-align: center;
+            padding: 20px;
+        }
+
+        section {
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .projects-grid,
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .card,
+        .product {
+            background-color: #F0FFFF;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .product img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .to-do-list,
+        .product-list {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .to-do-list li,
+        .product-list li {
+            background-color: #fff;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .task-completed {
+            text-decoration: line-through;
+        }
+
+        footer {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            header {
+                padding: 10px;
+            }
+
+            .container {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header>
+        <h1>DoggyDelights</h1>
+       
+    </header>
+
+    <!-- Portfolio Section -->
+    <section id="about">
+        <div class="container">
+            <h2>About Me</h2>
+            <p>Hi, I'm a web developer passionate about building interactive and responsive web applications. Here are a few of my projects!</p>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects">
+        <div class="container">
+            <h2>My Projects</h2>
+            <div class="projects-grid">
+                <div class="card">
+                    <h3>Personal Portfolio Website</h3>
+                    <p>This website showcases my work, skills, and contact info.</p>
+                </div>
+                <div class="card">
+                    <h3>To-Do List App</h3>
+                    <p>A simple to-do list app with local storage to persist data across page reloads.</p>
+                </div>
+                <div class="card">
+                    <h3>Product Listing Page</h3>
+                    <p>An e-commerce product listing page with filtering and sorting features for cosmetics.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- To-Do List Section -->
+    <section id="to-do">
+        <div class="container">
+            <h2>To-Do List</h2>
+            <input type="text" id="taskInput" placeholder="Add a new task" />
+            <button id="addTask">Add Task</button>
+            <ul id="taskList" class="to-do-list"></ul>
+        </div>
+    </section>
+
+    <!-- Product Listing Section (Cosmetics) -->
+    <section id="products">
+        <div class="container">
+            <h2>Meet our pack of dogs.....!</h2>
+            <label for="categoryFilter">Category:</label>
+            <select id="categoryFilter">
+                <option value="All">All</option>
+                <option value="Fluffy breed">Fluffy breed</option>
+                <option value="Pomeranian">Pomeranian</option>
+                <option value="Pug">Pug</option>
+            </select>
+
+            <label for="sortSelect">Sort By:</label>
+            <select id="sortSelect">
+                <option value="PriceLowToHigh">Price: Low to High</option>
+                <option value="PriceHighToLow">Price: High to Low</option>
+                <option value="Rating">Rating</option>
+            </select>
+
+            <div id="productContainer" class="product-grid"></div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2024 My Portfolio</p>
+    </footer>
+
+    <script>
+        // To-Do List with Local Storage
+        const addTaskButton = document.getElementById("addTask");
+        const taskInput = document.getElementById("taskInput");
+        const taskList = document.getElementById("taskList");
+
+        const loadTasks = () => {
+            const tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+            taskList.innerHTML = tasks
+                .map(
+                    (task, index) =>
+                        `<li>
+                            <span class="${task.completed ? "task-completed" : ""}">${task.name}</span>
+                            <button onclick="deleteTask(${index})">Delete</button>
+                            <button onclick="toggleComplete(${index})">${task.completed ? "Undo" : "Complete"}</button>
+                        </li>`
+                )
+                .join("");
+        };
+
+        const saveTasks = (tasks) => {
+            localStorage.setItem("tasks", JSON.stringify(tasks));
+        };
+
+        const toggleComplete = (index) => {
+            const tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+            tasks[index].completed = !tasks[index].completed;
+            saveTasks(tasks);
+            loadTasks();
+        };
+
+        const deleteTask = (index) => {
+            const tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+            tasks.splice(index, 1);
+            saveTasks(tasks);
+            loadTasks();
+        };
+
+        addTaskButton.addEventListener("click", () => {
+            const task = taskInput.value.trim();
+            if (task) {
+                const tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+                tasks.push({ name: task, completed: false });
+                saveTasks(tasks);
+                taskInput.value = "";
+                loadTasks();
+            }
+        });
+
+        loadTasks();
+
+        // Product Listing with Filtering and Sorting
+        const products = [
+            { name: "Fluffy breed", price: 30, rating: 4.8, category: "Fluffy breed", image: "https://tse2.mm.bing.net/th?id=OIP.koje2ng4yqTReNy4tfwfpQHaEA&pid=Api&P=0&h=180" },
+            { name: "Cavalier KIng Charles Spaniel", price: 40, rating: 5.0, category: "British bread", image: "https://tse1.mm.bing.net/th?id=OIP._LRA7NuVpo7b0BTZXdmNqQHaGg&pid=Api&P=0&h=180" },
+            { name: "Maltipoo", price: 35, rating: 4.7, category: "Poodle breeds", image: "https://tse3.mm.bing.net/th?id=OIP.RyHIKMXbfolWkiFGTb2IoQHaFS&pid=Api&P=0&h=180" },
+            { name: "Pomeranian", price: 45, rating: 5, category: "Pomeranian", image: "https://tse1.mm.bing.net/th?id=OIP.2BVn2ncWqiCFIw7rkpZPlwHaHM&pid=Api&P=0&h=180" },
+            { name: "Pug", price: 30, rating: 4.8, category: "Pug", image: "https://tse4.mm.bing.net/th?id=OIP.XpKWeE1j7A_9nM16NiLDiQHaE7&pid=Api&P=0&h=180" },
+            { name: "Pitbull", price: 35, rating: 5, category: "Pitbull", image: "https://tse4.mm.bing.net/th?id=OIP.AkQvS1rbzgRrvQqvqdyLWAHaEK&pid=Api&P=0&h=180" },
+        ];
+
+        const renderProducts = (filteredProducts) => {
+            const productContainer = document.getElementById("productContainer");
+            productContainer.innerHTML = filteredProducts
+                .map(
+                    (product) =>
+                        `<div class="product">
+                            <img src="${product.image}" alt="${product.name}">
+                            <h3>${product.name}</h3>
+                            <p>Price: $${product.price}</p>
+                            <p>Rating: ${product.rating} ⭐</p>
+                        </div>`
+                )
+                .join("");
+        };
+
+        const filterByCategory = (category) => {
+            return products.filter((product) => product.category === category || category === "All");
+        };
+
+        const sortProducts = (products, sortBy) => {
+            return products.sort((a, b) => {
+                if (sortBy === "PriceLowToHigh") return a.price - b.price;
+                if (sortBy === "PriceHighToLow") return b.price - a.price;
+                if (sortBy === "Rating") return b.rating - a.rating;
+                return 0;
+            });
+        };
+
+        document.getElementById("categoryFilter").addEventListener("change", (e) => {
+            const filteredProducts = filterByCategory(e.target.value);
+            const sortedProducts = sortProducts(filteredProducts, document.getElementById("sortSelect").value);
+            renderProducts(sortedProducts);
+        });
+
+        document.getElementById("sortSelect").addEventListener("change", (e) => {
+            const filteredProducts = filterByCategory(document.getElementById("categoryFilter").value);
+            const sortedProducts = sortProducts(filteredProducts, e.target.value);
+            renderProducts(sortedProducts);
+        });
+
+        renderProducts(products);
+    </script>
+</body>
